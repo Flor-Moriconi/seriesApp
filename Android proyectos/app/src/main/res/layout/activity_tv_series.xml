@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/black_background">
+
+    <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/black_90"
+                app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <ImageButton
+                    android:id="@+id/ib_search"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/ic_search"
+                    android:background="@color/black_90"/>
+
+            <EditText
+                    android:id="@+id/et_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:textColorHint="@color/white"
+                    android:textColor="@color/white"
+                    android:digits="abcdefghijklmnñopqrstuvwxyzáéíóúABCDEFGHIJKLMNNÑOPQRSTUVWXYZ /"
+                    android:hint="@string/search_serie"
+                    android:singleLine="true"
+                    android:gravity="center"
+                    android:textSize="17sp"/>
+
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminateTint="@color/white"
+            android:indeterminate="true" />
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:layout_alignTop="@+id/app_bar">
+
+        <TextView
+                android:id="@+id/tv_status_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="17dp"
+                android:textSize="12sp"
+                android:textAllCaps="true"
+                android:text="Todas"
+                android:textColor="@color/white"
+                android:fontFamily="sans-serif-medium"
+                android:alpha="0.5"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_tv_series"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="20dp"
+                android:elevation="10dp"
+                android:scrollbars="vertical"/>
+
+    </LinearLayout>
+
+</RelativeLayout>
