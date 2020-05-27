@@ -16,10 +16,10 @@ class TvSeriesRepository {
         return TvSeriesRepository()
     }
 
-    fun getTvSeries(list: MutableLiveData<List<TvSerie>>) {
+    fun getTvSeries(list: MutableLiveData<List<TvSerie>>, page: Int) {
         val service = RetrofitService().service
 
-        service.getTvSeries().enqueue(object : Callback<TvSeriesResponse> {
+        service.getTvSeries(page).enqueue(object : Callback<TvSeriesResponse> {
 
             override fun onResponse(call: Call<TvSeriesResponse>, response: Response<TvSeriesResponse>) {
                 val tvSeriesResponse = response.body()

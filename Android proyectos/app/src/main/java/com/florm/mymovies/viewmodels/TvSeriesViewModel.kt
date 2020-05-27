@@ -12,8 +12,8 @@ class TvSeriesViewModel : ViewModel() {
     var tvSeriesList = MutableLiveData<List<TvSerie>>()
     var genresList = MutableLiveData<List<Genre>>()
 
-    fun getTvSeries() {
-        repository.getTvSeries(tvSeriesList)
+    fun getTvSeries(page: Int) {
+        repository.getTvSeries(tvSeriesList, page)
     }
 
 

@@ -2,6 +2,7 @@ package com.florm.mymovies.views
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +21,8 @@ class TVSeriesListActivity: AppCompatActivity(), TvSeriesAdapter.TvSerieActivity
     private var progressBar: ProgressBar? = null
     private lateinit var viewModel : TvSeriesViewModel
 
+    private var page = 1 //First page
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tv_series)
@@ -27,7 +30,22 @@ class TVSeriesListActivity: AppCompatActivity(), TvSeriesAdapter.TvSerieActivity
         bindViewElements()
         createViewModel()
         observeViewModel()
-        getTvSeries()
+        addListeners()
+        getTvSeriesGenres()
+    }
+
+    private fun addListeners() {
+        tvSeriesRecyclerView?.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+
+                if (!recyclerView.canScrollVertically(1)) {
+                    page++
+                    val nextPage = page
+                    getTvSeries(nextPage)
+                }
+            }
+        })
     }
 
     private fun bindViewElements() {
@@ -42,21 +60,23 @@ class TVSeriesListActivity: AppCompatActivity(), TvSeriesAdapter.TvSerieActivity
     private fun observeViewModel() {
         viewModel.tvSeriesList.observe(this, Observer<List<TvSerie>> { list ->
             list.let {
-                viewModel.getTvSeriesGenres()
+                viewModel.genresList.value?.let { genresList ->
+                    if(tvSeriesAdapter == null) {
+                        loadTvSeriesList(it, genresList)
+                    } else {
+                        tvSeriesAdapter?.addData(it)
+                    }
+                }
             }
         })
 
-        viewModel.genresList.observe(this, Observer<List<Genre>> { genresList ->
-            genresList.let { genreList ->
-                viewModel.tvSeriesList.value?.let { tvSeriesList ->
-                    loadTvSeriesList(tvSeriesList, genresList)
-                }
-            }
+        viewModel.genresList.observe(this, Observer<List<Genre>> {
+            getTvSeries(page)
         })
     }
 
     private fun loadTvSeriesList(list: List<TvSerie>, genreList: List<Genre>) {
-        tvSeriesAdapter = TvSeriesAdapter(list, genreList, this)
+        tvSeriesAdapter = TvSeriesAdapter(list.toMutableList(), genreList, this)
         tvSeriesRecyclerView?.layoutManager = LinearLayoutManager(this)
         tvSeriesRecyclerView?.adapter = tvSeriesAdapter
 
@@ -73,7 +93,11 @@ class TVSeriesListActivity: AppCompatActivity(), TvSeriesAdapter.TvSerieActivity
         goToSerieDetail(item)
     }
 
-    private fun getTvSeries() {
-        viewModel.getTvSeries()
+    private fun getTvSeriesGenres() {
+        viewModel.getTvSeriesGenres()
+    }
+
+    private fun getTvSeries(page: Int) {
+        viewModel.getTvSeries(page)
     }
 }

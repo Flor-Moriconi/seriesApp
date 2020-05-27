@@ -13,7 +13,7 @@ import com.florm.mymovies.R
 import com.florm.mymovies.models.Genre
 import com.florm.mymovies.models.TvSerie
 
-class TvSeriesAdapter(private var list: List<TvSerie>, private var genreList: List<Genre>, private var listener: TvSerieActivityBridge): RecyclerView.Adapter<TvSeriesAdapter.ViewHolder>() {
+class TvSeriesAdapter(private var list: MutableList<TvSerie>, private var genreList: List<Genre>, private var listener: TvSerieActivityBridge): RecyclerView.Adapter<TvSeriesAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_tv_serie, parent, false))
@@ -29,7 +29,9 @@ class TvSeriesAdapter(private var list: List<TvSerie>, private var genreList: Li
         holder.title?.text = item.name
 
         item.genreIds?.let { list ->
-            holder.genre?.text = getGenreName(list.first())
+            if(list.count() != 0) {
+                holder.genre?.text = getGenreName(list.first())
+            }
         }
 
         holder.poster?.let {
@@ -71,6 +73,13 @@ class TvSeriesAdapter(private var list: List<TvSerie>, private var genreList: Li
 
     interface TvSerieActivityBridge {
         fun onSerieClicked(item: TvSerie)
+    }
+
+    fun addData(newItems: List<TvSerie>) {
+        val size = newItems.count()
+        this.list.addAll(newItems)
+        val newSize = this.list.size
+        notifyItemRangeChanged(size, newSize)
     }
 
 }
