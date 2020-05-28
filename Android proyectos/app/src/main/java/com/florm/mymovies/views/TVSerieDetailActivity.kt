@@ -6,7 +6,6 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.palette.graphics.Palette
@@ -23,8 +22,12 @@ import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.appbar.AppBarLayout
 import org.joda.time.LocalDate
 import android.animation.ObjectAnimator
+import android.widget.Button
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.core.widget.NestedScrollView
+import androidx.lifecycle.Observer
+import com.florm.mymovies.database.entities.SubscriptionEntity
 
 class TVSerieDetailActivity : AppCompatActivity() {
 
@@ -33,14 +36,16 @@ class TVSerieDetailActivity : AppCompatActivity() {
     private var releaseYearTextView: TextView? = null
     private var overviewTextView: TextView? = null
     private var posterImageView: ImageView? = null
-
+    private var subscribeButton: Button? = null
     private var coordinatorLayout: CoordinatorLayout? = null
-    private var collpasingToolbar: CollapsingToolbarLayout? = null
+    private var collapsingToolbar: CollapsingToolbarLayout? = null
     private var appBarLayout: AppBarLayout? = null
     private var imageCardView: CardView? = null
 
     private var scrollView: NestedScrollView? = null
     private lateinit var viewModel: TvSerieDetailViewModel
+
+    private var backgroundDominantColor = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +54,7 @@ class TVSerieDetailActivity : AppCompatActivity() {
         bindViewElements()
         addListeners()
         createViewModel()
+        addObservers()
         getIntentData()
     }
 
@@ -58,9 +64,9 @@ class TVSerieDetailActivity : AppCompatActivity() {
         releaseYearTextView = findViewById(R.id.tv_release_year)
         overviewTextView = findViewById(R.id.tv_description)
         posterImageView = findViewById(R.id.iv_poster)
-
+        subscribeButton = findViewById(R.id.btn_subscribe)
         coordinatorLayout = findViewById(R.id.coordinator_layout)
-        collpasingToolbar = findViewById(R.id.collpasing_toolbar)
+        collapsingToolbar = findViewById(R.id.collapsing_toolbar)
         appBarLayout = findViewById(R.id.app_bar_layout)
         imageCardView = findViewById(R.id.poster_cardview)
         scrollView = findViewById(R.id.scroll_view)
@@ -78,9 +84,29 @@ class TVSerieDetailActivity : AppCompatActivity() {
             scaleDownX.setDuration(0).start()
             scaleDownY.setDuration(0).start()
         })
+
+        subscribeButton?.setOnClickListener {
+            if(viewModel.isSubscribed()) {
+                viewModel.deleteSubscription()
+                setDesignButtonToSubscribe()
+            } else {
+                viewModel.makeSubscription()
+                setDesignButtonToIsSubscribed()
+            }
+        }
     }
 
+    private fun setDesignButtonToSubscribe() {
+        subscribeButton?.setBackgroundResource(R.drawable.button_border_round)
+        subscribeButton?.setText(R.string.subscribe_button_text)
+        subscribeButton?.setTextColor(ContextCompat.getColor(this, R.color.white))
+    }
 
+    private fun setDesignButtonToIsSubscribed() {
+        subscribeButton?.setBackgroundResource(R.drawable.button_subscribed_border_round)
+        subscribeButton?.setText(R.string.title_subscripted)
+        subscribeButton?.setTextColor(backgroundDominantColor)
+    }
 
     private fun createViewModel() {
         viewModel =  ViewModelProvider(this).get(TvSerieDetailViewModel::class.java)
@@ -115,6 +141,18 @@ class TVSerieDetailActivity : AppCompatActivity() {
         return date.year.toString()
     }
 
+    private fun addObservers() {
+        viewModel.subscriptionsList?.observe(this, Observer<List<SubscriptionEntity>> {
+            it.let {
+                if(viewModel.isSubscribed()) {
+                    setDesignButtonToIsSubscribed()
+                } else {
+                    setDesignButtonToSubscribe()
+                }
+            }
+        })
+    }
+
     private fun loadImageWithGlade(posterPath: String) {
         val urlString = IMAGE_BASE_URL + posterPath
 
@@ -137,14 +175,22 @@ class TVSerieDetailActivity : AppCompatActivity() {
                     fun onPalette(palette: Palette?) {
                         if (null != palette) {
                             if (palette.dominantSwatch != null) {
+                                backgroundDominantColor = palette.dominantSwatch!!.rgb
                                 coordinatorLayout?.setBackgroundColor(palette.dominantSwatch!!.rgb)
-                                collpasingToolbar?.setBackgroundColor(palette.dominantSwatch!!.rgb)
+                                collapsingToolbar?.setBackgroundColor(palette.dominantSwatch!!.rgb)
+
                             } else {
                                 if(palette.vibrantSwatch != null) { // Just in case that the library doesn't found the dominant color.
+                                    backgroundDominantColor = palette.vibrantSwatch!!.rgb
                                     coordinatorLayout?.setBackgroundColor(palette.vibrantSwatch!!.rgb)
-                                    collpasingToolbar?.setBackgroundColor(palette.vibrantSwatch!!.rgb)
+                                    collapsingToolbar?.setBackgroundColor(palette.vibrantSwatch!!.rgb)
                                 }
                             }
+                        }
+
+                        // Set color to the text
+                        if(viewModel.isSubscribed()) {
+                            subscribeButton?.setTextColor(backgroundDominantColor)
                         }
                     }
                 }).into(imageView)

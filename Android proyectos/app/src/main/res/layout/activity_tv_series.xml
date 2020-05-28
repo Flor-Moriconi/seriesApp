@@ -44,6 +44,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
+
     <ProgressBar
             android:id="@+id/progress_bar"
             android:layout_width="wrap_content"
@@ -58,6 +59,36 @@
             android:orientation="vertical"
             android:layout_marginTop="?attr/actionBarSize"
             android:layout_alignTop="@+id/app_bar">
+
+        <LinearLayout
+                android:id="@+id/subsciptions_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+            <TextView
+                    android:id="@+id/tv_subscriptions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="20dp"
+                    android:textSize="12sp"
+                    android:textAllCaps="true"
+                    android:text="@string/title_subscriptions"
+                    android:textColor="@color/white"
+                    android:fontFamily="sans-serif-medium"
+                    android:alpha="0.5"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_subscriptions"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="13dp"
+                    android:elevation="10dp"
+                    android:scrollbars="horizontal"/>
+
+        </LinearLayout>
 
         <TextView
                 android:id="@+id/tv_status_search"
